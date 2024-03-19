@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "188653735081",
+    "project_id": "pollos-app-delivery",
+    "storage_bucket": "pollos-app-delivery.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:188653735081:android:3217a44c2aeff9ebe16db8",
+        "android_client_info": {
+          "package_name": "com.pollos_app_delivery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCidhwWIoJV5naZzEORkohSTzySbtRGE2A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
