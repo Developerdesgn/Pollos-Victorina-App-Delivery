@@ -6,6 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import {AppDelivery, AuthScreens, IntroScreens} from './src/navigation/Stack';
 import {AppContext} from './src/Providers';
+import BootSplash from 'react-native-bootsplash';
+import Loader from './src/components/loader';
 
 const App = () => {
   async function requestUserPermission() {
@@ -69,11 +71,25 @@ const App = () => {
     notificationService();
   }, []);
 
+  useEffect(() => {
+    const init = async () => {
+      // …do multiple sync or async tasks
+    };
+
+    init().finally(async () => {
+      await BootSplash.hide({fade: true});
+      console.log('BootSplash has been hidden successfully');
+    });
+  }, []);
+
   const [token, setToken] = useState('');
+  const [loading, setLoading] = useState(false);
   // const [userData, setUserData] = useState('');
   const userSetting = {
     token: token,
     setToken: setToken,
+    loading: loading,
+    setLoading: setLoading,
     // userData: userData,
     // setUserData: setUserData,
   };
@@ -99,11 +115,12 @@ const App = () => {
     // }
   };
   return (
-    <NavigationContainer>
-      <AppContext.Provider value={userSetting}>
+    <AppContext.Provider value={userSetting}>
+      {loading ? <Loader /> : null}
+      <NavigationContainer>
         {!token ? <AuthScreens /> : <AppDelivery />}
-      </AppContext.Provider>
-    </NavigationContainer>
+      </NavigationContainer>
+    </AppContext.Provider>
     // <Text>Maaz</Text>
   );
 };

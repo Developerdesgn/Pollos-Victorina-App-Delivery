@@ -25,6 +25,7 @@
 		2DC0DFA4D106455FB25CD46E /* GothicA1-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 19C7604610464FA787AC0524 /* GothicA1-Thin.ttf */; };
 		EBC0F42B0F3E4930B6EBA46D /* call.svg in Resources */ = {isa = PBXBuildFile; fileRef = 28C33CC698A544C5A4DB4377 /* call.svg */; };
 		649137D5DACF4D11A0679D7C /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = 58ACF4CD06BD4F18B444DBA3 /* index.js */; };
+		42C643B50EAF48F6A42D7740 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7AE4258EFB464D17B6459D3D /* BootSplash.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 		19C7604610464FA787AC0524 /* GothicA1-Thin.ttf */ = {isa = PBXFileReference; name = "GothicA1-Thin.ttf"; path = "../src/assets/fonts/GothicA1-Thin.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		28C33CC698A544C5A4DB4377 /* call.svg */ = {isa = PBXFileReference; name = "call.svg"; path = "../src/assets/fonts/call.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		58ACF4CD06BD4F18B444DBA3 /* index.js */ = {isa = PBXFileReference; name = "index.js"; path = "../src/assets/fonts/index.js"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		7AE4258EFB464D17B6459D3D /* BootSplash.storyboard */ = {isa = PBXFileReference; name = "BootSplash.storyboard"; path = "pollos_App_Delivery/BootSplash.storyboard"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +116,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				7AE4258EFB464D17B6459D3D /* BootSplash.storyboard */,
 			);
 			name = pollos_App_Delivery;
 			sourceTree = "<group>";
@@ -297,6 +300,7 @@
 				2DC0DFA4D106455FB25CD46E /* GothicA1-Thin.ttf in Resources */,
 				EBC0F42B0F3E4930B6EBA46D /* call.svg in Resources */,
 				649137D5DACF4D11A0679D7C /* index.js in Resources */,
+				42C643B50EAF48F6A42D7740 /* BootSplash.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,35 +1,72 @@
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
-import React, {useContext, useState} from 'react';
-import {colors} from '../../constants';
-import {
-  Facebook,
-  Google,
-  HeaderSvg,
-  HorLine,
-  Lock,
-  LogoRed,
-  TimerWhite,
-} from '../../assets/images/svg';
-import CustomTextInput from '../../components/CustomTextInput';
-import {moderateScale} from 'react-native-size-matters';
-import CustomButton from '../../components/CustomButton';
-import Header from '../../components/Header';
-import FontSizes from '../../constants/fontSizes';
-import Fonts from '../../assets/fonts';
-import SocialButtons from '../../components/SocialButtons';
-import {screenWidth} from '../../constants/screenResolution';
-import {AppContext} from '../../Providers';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useContext, useEffect, useState} from 'react';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {moderateScale} from 'react-native-size-matters';
+import {AppContext} from '../../Providers';
+import Fonts from '../../assets/fonts';
+import CustomButton from '../../components/CustomButton';
+import CustomTextInput from '../../components/CustomTextInput';
+import Header from '../../components/Header';
+import {colors} from '../../constants';
+import FontSizes from '../../constants/fontSizes';
+import {screenWidth} from '../../constants/screenResolution';
+
+import {Alert, Keyboard} from 'react-native';
+import {login} from '../../services/AuthServices';
+import {checkToken} from '../../services/notificationService';
 // import {ScrollView} from 'react-native-gesture-handler';
+import {reg} from '../../services/AuthServices';
 
 const SignInRider = ({navigation}) => {
   const context = useContext(AppContext);
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  // console.log(context)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [submitDisable, setSubmitDisable] = useState(true);
+  const [fcm, setFcm] = useState('');
 
-  // const setData = async data => {
-  //   await AsyncStorage.setItem('userData', JSON.stringify(data));
-  // };
+  useEffect(() => {
+    checkToken(setFcm);
+  }, []);
+
+  useEffect(() => {
+    if (email && password && !error) {
+      setSubmitDisable(false);
+    }
+  }, [email, password]);
+
+  const validate = async () => {
+    context.setToken('rider');
+    await AsyncStorage.setItem('token', 'rider');
+    await AsyncStorage.setItem('userData', JSON.stringify({}));
+    return;
+    console.log(email, error, password, submitDisable);
+    if (email && !error && password) {
+      context.setLoading(true);
+      Keyboard.dismiss();
+      await login({email: email, password: password})
+        .then(async res => {
+          console.log(res);
+          if (res.status === 200) {
+            context.setToken(res?.data?.token);
+            await AsyncStorage.setItem('token', res?.data?.token);
+            await AsyncStorage.setItem(
+              'userData',
+              JSON.stringify(res?.data?.user),
+            );
+          }
+        })
+        .catch(error => {
+          console.log(error, 'errr');
+          if (error.response.status === 401) {
+            Alert.alert(error.response.data.message);
+          }
+        })
+        .finally(() => context.setLoading(false));
+    }
+  };
+
   return (
     <ScrollView
       style={{flex: 1, backgroundColor: colors.white, width: screenWidth}}>
@@ -54,31 +91,35 @@ const SignInRider = ({navigation}) => {
           INICIO
         </Text>
         <CustomTextInput
-          placeholder={'Usuario*'}
+          placeholder={'Correo electronico*'}
           keyboardType={'email-address'}
           value={email}
-          handleTextChange={text => setEmail(text)}
-          LeftIcon="person-circle-outline"
+          handleTextChange={e => {
+            if (reg.test(e)) {
+              setError('');
+            } else {
+              setError('Ex: myemail@host.xyz');
+            }
+            setEmail(e);
+          }}
+          leftIcon="mail-outline"
           marginTop={moderateScale(20, 0.1)}
+          error={error}
         />
         <CustomTextInput
           visible={false}
           placeholder={'Contraseña*'}
           value={password}
-          handleTextChange={e => setPassword(e)}
+          handleTextChange={e => {
+            setPassword(e);
+          }}
           rightIcon={true}
           marginTop={moderateScale(20, 0.1)}
         />
         <CustomButton
-          onPress={() => {
-            context.setToken('sania');
-            AsyncStorage.setItem('token', 'sania');
-            // navigation.navigate('Delivery');
-          }}
-          // RightIcon={true}
-          // RIcon={TimerWhite}
+          disable={submitDisable}
+          onPress={validate}
           title={'Ingresar'}
-          // rightText={'Iniciar Turno'}
           marginTop={moderateScale(25, 0.1)}
         />
         <Text

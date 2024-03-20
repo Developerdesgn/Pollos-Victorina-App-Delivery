@@ -51,8 +51,8 @@ const AuthStack = createStackNavigator();
 const AuthScreens = () => {
   return (
     <AuthStack.Navigator screenOptions={{headerShown: false}}>
-      <AuthStack.Screen name="Intro1" component={Intro1} />
-      <AuthStack.Screen name="Intro2" component={Intro2} />
+      {/* <AuthStack.Screen name="Intro1" component={Intro1} />
+      <AuthStack.Screen name="Intro2" component={Intro2} /> */}
       <AuthStack.Screen name="SignInRider" component={SignInRider} />
       <AuthStack.Screen
         name="ForgetPasswordRider"
