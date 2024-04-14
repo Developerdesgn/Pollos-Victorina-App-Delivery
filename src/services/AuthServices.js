@@ -23,6 +23,8 @@ export const signup = ({
   address,
   password,
   repeatPassword,
+  device_token,
+  role,
 }) =>
   axios.post(API.signup, {
     headers: {
@@ -33,7 +35,9 @@ export const signup = ({
     last_name: lastName,
     email,
     ballot: 'testing',
+    role,
     telephone: phoneNum,
+    device_token,
     address,
     password,
     password_confirmation: repeatPassword,

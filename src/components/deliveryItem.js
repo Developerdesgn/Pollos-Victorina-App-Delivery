@@ -1,4 +1,4 @@
-import {View, Text} from 'react-native';
+import {View, Text, Image} from 'react-native';
 import React from 'react';
 import Fonts from '../assets/fonts';
 import {colors} from '../constants';
@@ -10,7 +10,9 @@ import styles from '../globalStyle';
 import Button from './button';
 import Clock from '../assets/images/svg/Timer.svg';
 import {screenWidth} from '../constants/screenResolution';
-const DeliveryItem = ({time, onPress}) => {
+
+const DeliveryItem = ({time, data, startOrder}) => {
+  // console.log(data);
   return (
     <View style={{width: '100%', marginBottom: moderateScale(15)}}>
       <View
@@ -25,10 +27,22 @@ const DeliveryItem = ({time, onPress}) => {
             flexDirection: 'row',
           },
         ]}>
-        <View style={{alignSelf: 'center', flex: 0.4}}>
-          <ComboChickenSvg />
+        <View style={{alignSelf: 'center', flex: 0.35}}>
+          <View style={{width: moderateScale(120), height: moderateScale(80)}}>
+            <Image
+              source={{uri: data?.product_image}}
+              resizeMode="contain"
+              style={{width: '100%', height: '100%'}}
+            />
+          </View>
+          {/* <ComboChickenSvg /> */}
         </View>
-        <View style={{flex: 0.6}}>
+        <View
+          style={{
+            flex: 0.65,
+            alignContent: 'center',
+            justifyContent: 'center',
+          }}>
           <Text
             style={{
               top: moderateScale(2),
@@ -38,7 +52,8 @@ const DeliveryItem = ({time, onPress}) => {
               color: colors.primaryA,
               fontSize: FontSizes.xsmall,
             }}>
-            ID #5679
+            {data?.order_id}
+            {/* ID #5679 */}
           </Text>
           <View>
             <Text
@@ -47,7 +62,8 @@ const DeliveryItem = ({time, onPress}) => {
                 color: colors.gray,
                 fontSize: FontSizes.xsmall,
               }}>
-              13 Sept, 10:00pm
+              {/* 13 Sept, 10:00pm */}
+              {data?.created_at}
             </Text>
             <Text
               style={{
@@ -58,40 +74,44 @@ const DeliveryItem = ({time, onPress}) => {
                 // width: '80%',
               }}>
               {/* {text} */}
-              Combo 2 Piezas de Pollo x2
+              {/* Combo 2 Piezas de Pollo x2 */}
+              {data?.product_name}
             </Text>
-            <Text
-              style={{
-                fontFamily: Fonts.regular,
-                color: colors.gray,
-                fontSize: FontSizes.xsmall,
-              }}>
-              {/* {text} */}
-              <Text style={{color: colors.black, fontWeight: '700'}}>
-                1x
-              </Text>{' '}
-              Refresco de uva
-            </Text>
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <Ionicons
-                name={'location-outline'}
-                size={moderateScale(14)}
-                color={colors.gray}
-              />
+            {data?.addtional_selection && (
               <Text
                 style={{
                   fontFamily: Fonts.regular,
                   color: colors.gray,
                   fontSize: FontSizes.xsmall,
+                }}>
+                {/* {text} */}
+                <Text style={{color: colors.black, fontWeight: '700'}}>
+                  1x
+                </Text>{' '}
+                {data?.addtional_selection}
+              </Text>
+            )}
 
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'flex-start',
+              }}>
+              <Ionicons
+                name={'location-outline'}
+                size={moderateScale(10)}
+                color={colors.primary}
+                style={{marginTop: moderateScale(2)}}
+              />
+              <Text
+                style={{
+                  fontFamily: Fonts.regular,
+                  color: colors.primary,
+                  fontSize: FontSizes.xsmall,
                   width: screenWidth - moderateScale(200),
                 }}>
-                Av. Winston Churchill, Multicentro
+                {data?.user_address}
               </Text>
             </View>
             <Text
@@ -102,7 +122,7 @@ const DeliveryItem = ({time, onPress}) => {
                 paddingLeft: moderateScale(5, 0.1),
                 width: '100%',
               }}>
-              $ 545.00
+              Total: ${data?.total}
             </Text>
           </View>
         </View>
@@ -111,7 +131,6 @@ const DeliveryItem = ({time, onPress}) => {
             style={[
               styles.row,
               {
-                // backgroundColor:"red",
                 alignItems: 'center',
                 bottom: moderateScale(5),
                 right: moderateScale(50),
@@ -150,7 +169,7 @@ const DeliveryItem = ({time, onPress}) => {
       </View>
       {!time ? (
         <Button
-          onPress={onPress}
+          onPress={() => startOrder(data)}
           text={'Empezar entrega'}
           btnStyle={styles.primaryBtn}
         />

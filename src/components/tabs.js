@@ -4,12 +4,28 @@ import {moderateScale} from 'react-native-size-matters';
 import {colors} from '../constants';
 import styless from '../globalStyle';
 
-const Tabs = ({selectedButton, setSelectedButton, Icon1, Icon2}) => {
+const Tabs = ({
+  selectedButton,
+  setSelectedButton,
+  ordercount,
+  historyCount,
+  getOrders,
+  getOrders2,
+  Icon1,
+  Icon2,
+}) => {
   const handleButtonPress = buttonName => {
     setSelectedButton(buttonName);
+    if (buttonName === 'PEDIDOS EN CURSO') {
+      getOrders(false);
+    } else {
+      getOrders2(false);
+    }
   };
+  // console.log(historyCount, ordercount, 'bpth');
 
   const isButtonSelected = buttonName => {
+    // console.log(selectedButton, buttonName, 'sdds');
     return selectedButton === buttonName;
   };
 
@@ -20,13 +36,13 @@ const Tabs = ({selectedButton, setSelectedButton, Icon1, Icon2}) => {
           styles.button,
           {backgroundColor: colors.white},
           styless.shadow,
-          isButtonSelected(text) && styles.isSelected,
+          isButtonSelected(desc) && styles.isSelected,
         ]}
-        onPress={() => handleButtonPress(text)}>
+        onPress={() => handleButtonPress(desc)}>
         <Text
           style={[
             styles.bigText,
-            {color: isButtonSelected(text) ? colors.primaryA : colors.black},
+            {color: isButtonSelected(desc) ? colors.primaryA : colors.black},
           ]}>
           {text}
         </Text>
@@ -44,8 +60,8 @@ const Tabs = ({selectedButton, setSelectedButton, Icon1, Icon2}) => {
 
   return (
     <View style={styles.container}>
-      <Tab text={'02'} desc={'PEDIDOS EN CURSO'} />
-      <Tab text={'01'} desc={'HISTORIAL DE PEDIDOS'} />
+      <Tab text={ordercount} desc={'PEDIDOS EN CURSO'} />
+      <Tab text={historyCount} desc={'HISTORIAL DE PEDIDOS'} />
     </View>
   );
 };

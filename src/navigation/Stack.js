@@ -9,6 +9,9 @@ import OrderCancelRider from '../screens/Rider/OrderCancelRider';
 import CancelRider from '../screens/Rider/CancelRider';
 import Intro1 from '../screens/Rider/Intro1';
 import Intro2 from '../screens/Rider/Intro2';
+import Register from '../screens/AuthRider/Register';
+import OtpCheck from '../screens/AuthRider/OtpCheck';
+import ResetPassword from '../screens/AuthRider/ResestPassword';
 
 {
   /* <MainStack.Navigator screenOptions={{headerShown: false}}>
@@ -58,6 +61,9 @@ const AuthScreens = () => {
         name="ForgetPasswordRider"
         component={ForgetPasswordRider}
       />
+      <AuthStack.Screen name="Register" component={Register} />
+      <AuthStack.Screen name="OtpCheck" component={OtpCheck} />
+      <AuthStack.Screen name="ResetPassword" component={ResetPassword} />
     </AuthStack.Navigator>
   );
 };

@@ -8,7 +8,16 @@ export default API = {
   signup: `${baseURL}/auth/register`,
   login: `${baseURL}/auth/login`,
   forgetPassword: `${baseURL}/auth/forget-password`,
-  orderinProgress: `${baseURL}/auth/orders-in-progress`,
+  forgetPassword: `${baseURL}/auth/forget-password`,
+  otpcheck: `${baseURL}/auth/check-otp`,
+  changePassword: `${baseURL}/auth/change-password`,
+  getCount: `${baseURL}/rider-orders-count`,
+  orderinProgress: `${baseURL}/rider-orders-in-progress`,
+  orderinHistory: `${baseURL}/rider-orders-in-progress`,
+  getCancelReasons: `${baseURL}/get-order-cancel-reasons`,
+  cancelOrder: `${baseURL}/cancel-order`,
+  startOrder: `${baseURL}/rider-start-order`,
+  orderComplete: `${baseURL}/rider-complete-order`,
 };
 
 export const networkCheck = error => {

@@ -16,7 +16,6 @@ import FontSizes from '../constants/fontSizes';
 import Fonts from '../assets/fonts';
 
 const RHeader = ({title, text, ID, onPress}) => {
-  const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <HeaderSvg width={419} height={133} />
@@ -44,7 +43,7 @@ const RHeader = ({title, text, ID, onPress}) => {
         <View style={{marginLeft: moderateScale(20)}}>
           <Text style={styles.text}>{title}</Text>
           <Text style={styles.text2}>{text}</Text>
-          <Text style={styles.text2}>ID #{ID}</Text>
+          <Text style={styles.text2}>ID# {ID}</Text>
         </View>
       </View>
 

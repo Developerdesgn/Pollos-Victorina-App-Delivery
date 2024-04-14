@@ -22,6 +22,7 @@ const CustomTextInput = ({
   error,
   multiline,
   height,
+  max,
 }) => {
   const [secureTextEntry, setSecureTextEntry] = useState(visible);
 
@@ -57,6 +58,7 @@ const CustomTextInput = ({
           </View>
         )}
         <TextInput
+          maxLength={max}
           secureTextEntry={secureTextEntry}
           style={{
             flex: 1,

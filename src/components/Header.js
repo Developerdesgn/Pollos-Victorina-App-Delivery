@@ -13,7 +13,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import styless from '../globalStyle';
 import {useNavigation} from '@react-navigation/native';
 
-const Header = ({back, heart, logo, title, backIcon, titleAlign}) => {
+const Header = ({back, heart, logo, title, backIcon, titleAlign, onPress}) => {
   const [heartClicked, setHeartClicked] = useState(false);
   const navigation = useNavigation();
   return (
@@ -35,7 +35,7 @@ const Header = ({back, heart, logo, title, backIcon, titleAlign}) => {
       {!back ? (
         <TouchableOpacity
           onPress={() => {
-            navigation.goBack();
+            onPress ? onPress() : navigation.goBack();
           }}
           style={{
             position: 'absolute',

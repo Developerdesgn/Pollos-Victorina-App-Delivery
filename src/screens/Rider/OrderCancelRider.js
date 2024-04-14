@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import HeaderIcon from '../../components/HeaderIcon';
 import {moderateScale} from 'react-native-size-matters';
 import ComboChicken from '../../components/ComboChicken';
@@ -10,72 +10,94 @@ import {screenWidth} from '../../constants/screenResolution';
 import FontSizes from '../../constants/fontSizes';
 import Fonts from '../../assets/fonts';
 import CustomButton from '../../components/CustomButton';
+import {AppContext} from '../../Providers';
+import {networkCheck} from '../../constants/axios';
+import {OrderServices, RiderServices} from '../../services';
 
-const OrderCancelRider = ({navigation}) => {
+const OrderCancel = ({navigation, route}) => {
+  const context = useContext(AppContext);
   const [description, setDescription] = useState('');
-  const [isSelected, setIsSelected] = useState([
-    {
-      id: 1,
-      name: 'La persona no se presento',
-      selected: true,
-    },
-    {
-      id: 2,
-      name: 'No toman las llamadas',
-      selected: false,
-    },
-    {
-      id: 3,
-      name: 'No encontre el lugar',
-      selected: false,
-    },
-    {
-      id: 4,
-      name: 'Orden equivocada',
-      selected: false,
-    },
-    {
-      id: 5,
-      name: 'Por avería',
-      selected: false,
-    },
-  ]);
+  const [reason, setReason] = useState('');
+  const [isSelected, setIsSelected] = useState([]);
+
+  useEffect(() => {
+    getReasons();
+  }, []);
+
+  const getReasons = async () => {
+    context.setLoading(true);
+    await RiderServices.getCancelReasons({token: context.token})
+      .then(res => {
+        console.log(res?.data, 'reasons');
+        setIsSelected(res?.data);
+      })
+      .catch(err => {
+        console.log(err, 'error');
+        networkCheck(err);
+      })
+      .finally(() => {
+        context.setLoading(false);
+      });
+  };
+
+  const cancelOrder = async () => {
+    if (reason && description) {
+      context.setLoading(true);
+      const body = {
+        order_id: 1,
+        cancel_reason: reason,
+        cancel_reason_description: description,
+      };
+      console.log(body, 'body');
+      setReason('');
+      setDescription('');
+      await RiderServices.cancelOrder({reasons: body, token: context.token})
+        .then(res => {
+          console.log(res?.data, 'cancel order');
+          navigation.navigate('CancelRider');
+        })
+        .catch(err => {
+          console.log(err?.response?.data, 'error1');
+          networkCheck(err);
+        })
+        .finally(() => {
+          context.setLoading(false);
+        });
+    }
+  };
 
   const onRadioBtnClick = (item, isSelected, setIsSelected) => {
     let updatedState = isSelected.map(isSelectedItem =>
-      isSelectedItem.id === item.id
+      isSelectedItem.title === item.title
         ? {...isSelectedItem, selected: true}
         : {...isSelectedItem, selected: false},
     );
     setIsSelected(updatedState);
-
-    console.log(item.name);
+    setReason(item?.title);
+    console.log(item.title);
   };
+
   return (
     <ScrollView
-      contentContainerStyle={{backgroundColor: colors.white}}
+      showsVerticalScrollIndicator={false}
       style={{
         backgroundColor: colors.white,
+        // marginBottom: moderateScale(50),
         width: screenWidth,
       }}>
+      <HeaderIcon
+        navigation={navigation}
+        text={'Cancelar pedido'}
+        marginTop={moderateScale(30, 0.1)}
+      />
       <View
         style={{
           width: screenWidth - 50,
           marginLeft: 'auto',
           marginRight: 'auto',
         }}>
-        <Text
-          style={{
-            fontFamily: Fonts.extraBold,
-            color: colors.primary,
-            fontSize: FontSizes.large1,
-            marginTop: moderateScale(25, 0.1),
-            textAlign: 'center',
-          }}>
-          Cancelar pedido
-        </Text>
         <View style={{marginVertical: moderateScale(20, 0.1)}}>
-          <ComboChicken />
+          <ComboChicken data={route?.params?.data} />
         </View>
         <Text
           style={[
@@ -85,13 +107,14 @@ const OrderCancelRider = ({navigation}) => {
           ]}>
           Motivo
         </Text>
-        {isSelected.map((item, i) => (
+
+        {isSelected?.map((item, i) => (
           <View style={{...styles.radioBtn}} key={i}>
             <RadioButton
               onPress={() => onRadioBtnClick(item, isSelected, setIsSelected)}
-              selected={item.selected}
-              key={item.id}>
-              {item.name}
+              selected={item?.selected}
+              key={i}>
+              {item?.title}
             </RadioButton>
           </View>
         ))}
@@ -102,17 +125,16 @@ const OrderCancelRider = ({navigation}) => {
           numberOfLines={8} // You can adjust the number of lines as needed
           value={description}
           onChangeText={e => setDescription(e)}
-          placeholderTextColor={colors.lightGrey}
+          placeholderTextColor={colors.grey}
         />
         <View style={{alignItems: 'center'}}>
           <CustomButton
-            onPress={() => {
-              navigation.navigate('CancelRider');
-            }}
+            disable={reason === '' || description === ''}
+            onPress={cancelOrder}
             title={'Cancelar pedido'}
-            width={308}
+            width={moderateScale(300)}
             marginTop={moderateScale(10, 0.1)}
-            marginBottom={moderateScale(0, 0.1)}
+            marginBottom={moderateScale(70, 0.1)}
           />
         </View>
       </View>
@@ -121,10 +143,11 @@ const OrderCancelRider = ({navigation}) => {
 };
 const style = StyleSheet.create({
   descriptionInput: {
-    borderColor: colors.secondary,
+    color: colors.gray,
+    borderColor: colors.lightGrey,
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 10,
+    borderRadius: moderateScale(8),
+    padding: moderateScale(15),
     marginVertical: moderateScale(30, 0.1),
     fontSize: FontSizes.medium,
     fontFamily: Fonts.medium,
@@ -134,4 +157,4 @@ const style = StyleSheet.create({
     width: screenWidth - 50, // This property ensures the text starts from the top
   },
 });
-export default OrderCancelRider;
+export default OrderCancel;

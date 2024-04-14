@@ -38,7 +38,7 @@ const CustomModal = ({modalVisible, setModalVisible, onPress1, onPress2}) => {
               <Cancel width={moderateScale(27)} height={moderateScale(27)} />
             </TouchableOpacity>
             <Text style={[styless.mV, styles.modalText]}>
-              Desea eliminar finalizar su labor?
+              ¿Quieres terminar tu trabajo?
             </Text>
             <Button
               onPress={onPress1}

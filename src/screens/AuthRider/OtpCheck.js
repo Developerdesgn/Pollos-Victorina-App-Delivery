@@ -26,36 +26,34 @@ import FontSizes from '../../constants/fontSizes';
 import Fonts from '../../assets/fonts';
 import SocialButtons from '../../components/SocialButtons';
 import {screenWidth} from '../../constants/screenResolution';
-import {forgetPass, reg} from '../../services/AuthServices';
+import {forgetPass, otpCheck, reg} from '../../services/AuthServices';
 import {AppContext} from '../../Providers';
-import {networkCheck} from '../../constants/axios';
 // import {ScrollView} from 'react-native-gesture-handler';
 
-const ForgetPassword = ({navigation}) => {
+const OtpCheck = ({navigation, route}) => {
   const context = useContext(AppContext);
-
-  const [email, setEmail] = useState();
-
-  const [Eerror, setEerror] = useState('');
+  const [code, setCode] = useState('');
   const [submitDisable, setSubmitDisable] = useState(true);
 
   const validate = async () => {
-    console.log(email, Eerror);
-    if (email && !Eerror) {
+    console.log(route?.params?.email, code);
+    if (code) {
       context.setLoading(true);
       Keyboard.dismiss();
-      await forgetPass({email: email})
-        .then(async res => {
-          console.log(res, 'succcess');
+      await otpCheck({email: route?.params?.email, otp: code})
+        .then(res => {
+          console.log(res?.data, 'succcess');
           if (res.status === 200) {
-            navigation.navigate('OtpCheck', {email: email});
-            setEmail('');
+            navigation.navigate('ResetPassword', {
+              email: route?.params?.email,
+              code: code,
+            });
+            setCode('');
           }
         })
         .catch(error => {
-          console.log(error, 'errr');
-          networkCheck(error);
-          if (error?.response?.status === 401) {
+          console.log(error?.response, 'invalid');
+          if (error?.response?.data?.message === 'invalid') {
             Alert.alert(error?.response?.data?.message);
           }
         })
@@ -88,31 +86,28 @@ const ForgetPassword = ({navigation}) => {
               color: colors.gray,
               fontSize: FontSizes.large1,
             }}>
-            ¿Has olvidado tu contraseña?
+            Consultar su correo electrónico
           </Text>
           <CustomTextInput
-            placeholder={'Correo electronico*'}
-            keyboardType={'email-address'}
-            value={email}
+            max={4}
+            placeholder={'ingrese el código otp*'}
+            keyboardType={'numeric'}
+            value={code}
             handleTextChange={e => {
-              if (reg.test(e)) {
-                setEerror('');
+              if (e?.length === 4) {
                 setSubmitDisable(false);
               } else {
-                setEerror('Ex: myemail@host.xyz');
+                setSubmitDisable(true);
               }
-              setEmail(e);
+              setCode(e);
             }}
-            LeftIcon="mail-outline"
+            // LeftIcon="mail-outline"
             marginTop={moderateScale(20, 0.1)}
-            error={Eerror}
           />
           <CustomButton
             disable={submitDisable}
             onPress={validate}
-            LeftIcon={true}
-            Icon={Lock}
-            title={'Restablecer contraseña'}
+            title={'Continuar'}
             marginTop={moderateScale(25, 0.1)}
           />
         </View>
@@ -144,4 +139,4 @@ const styles = StyleSheet.create({
     width: '28%',
   },
 });
-export default ForgetPassword;
+export default OtpCheck;

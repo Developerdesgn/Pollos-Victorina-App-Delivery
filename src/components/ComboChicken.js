@@ -28,12 +28,20 @@ const ComboChicken = ({
         width: width,
         alignSelf: 'center',
       }}>
-      <View style={{width: screenWidth * 0.3, height: screenHeight * 0.15}}>
-        {data?.product?.image ? (
+      <View
+        style={{
+          width: moderateScale(100),
+          height: moderateScale(120),
+          marginRight: moderateScale(10),
+        }}>
+        {data?.product_image ? (
           <Image
-            source={{uri: data?.product?.image}}
+            source={{uri: data?.product_image}}
             resizeMode={'cover'}
-            style={{width: '100%', height: '100%'}}
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
           />
         ) : (
           <ComboChickenSvg
@@ -44,13 +52,13 @@ const ComboChicken = ({
           />
         )}
       </View>
-      <View>
+      <View style={{padding: moderateScale(10)}}>
         <Text
           style={{
             fontFamily: Fonts.extraBold,
             color: colors.primary,
             fontSize: FontSizes.medium,
-            width: '80%',
+            width: '100%',
             //   marginTop: moderateScale(15, 0.1),
           }}>
           {/* {text} */}
@@ -86,33 +94,40 @@ const ComboChicken = ({
             color: colors.gray,
             fontSize: FontSizes.small,
           }}>
-          {text1 ? text1 : '13 Sept, 10:00pm'}
+          {data?.created_at ? data?.created_at : '13 Sept, 10:00pm'}
         </Text>
-        <Text
-          style={
-            text1
-              ? {
-                  fontFamily: Fonts.bold,
-                  color: colors.gray,
-                  fontSize: FontSizes.small,
-                }
-              : {
-                  fontFamily: Fonts.medium,
-                  color: colors.darkishGray,
-                  fontSize: FontSizes.regular,
-                  marginTop: moderateScale(5, 0.1),
-                }
-          }>
-          {text2 ? text2 : '1x Refresco De Uva'}
-        </Text>
-        {id && (
+        {data?.addtional_selection && (
+          <Text
+            style={{
+              fontFamily: Fonts.medium,
+              color: colors.darkishGray,
+              fontSize: FontSizes.regular,
+              marginTop: moderateScale(5, 0.1),
+            }}>
+            1x {data?.addtional_selection}
+          </Text>
+        )}
+
+        {data?.drink && (
+          <Text
+            style={{
+              fontFamily: Fonts.medium,
+              color: colors.darkishGray,
+              fontSize: FontSizes.regular,
+              // marginTop: moderateScale(5, 0.1),
+            }}>
+            1x {data?.drink}
+          </Text>
+        )}
+
+        {data?.order_id && (
           <Text
             style={{
               fontFamily: Fonts.medium,
               color: colors.gray,
               fontSize: FontSizes.small,
             }}>
-            ID #5679
+            {data?.order_id}
           </Text>
         )}
       </View>

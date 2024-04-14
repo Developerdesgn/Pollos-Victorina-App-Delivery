@@ -37,19 +37,21 @@ const SignInRider = ({navigation}) => {
   }, [email, password]);
 
   const validate = async () => {
-    context.setToken('rider');
-    await AsyncStorage.setItem('token', 'rider');
-    await AsyncStorage.setItem('userData', JSON.stringify({}));
-    return;
+    // context.setToken('rider');
+    // await AsyncStorage.setItem('token', 'rider');
+    // await AsyncStorage.setItem('userData', JSON.stringify({}));
+    // return;
     console.log(email, error, password, submitDisable);
     if (email && !error && password) {
       context.setLoading(true);
       Keyboard.dismiss();
       await login({email: email, password: password})
         .then(async res => {
-          console.log(res);
+          console.log(res?.data);
           if (res.status === 200) {
             context.setToken(res?.data?.token);
+            context.setUserData(res?.data?.user);
+
             await AsyncStorage.setItem('token', res?.data?.token);
             await AsyncStorage.setItem(
               'userData',
@@ -107,7 +109,7 @@ const SignInRider = ({navigation}) => {
           error={error}
         />
         <CustomTextInput
-          visible={false}
+          visible={true}
           placeholder={'Contraseña*'}
           value={password}
           handleTextChange={e => {
@@ -116,22 +118,40 @@ const SignInRider = ({navigation}) => {
           rightIcon={true}
           marginTop={moderateScale(20, 0.1)}
         />
-        <CustomButton
-          disable={submitDisable}
-          onPress={validate}
-          title={'Ingresar'}
-          marginTop={moderateScale(25, 0.1)}
-        />
+
         <Text
           onPress={() => {
             navigation.navigate('ForgetPasswordRider');
           }}
           style={{
             fontFamily: Fonts.regular,
-            color: colors.gray,
+            color: colors.primary,
             fontSize: FontSizes.regular,
+            marginTop: moderateScale(10),
+            marginRight: moderateScale(20),
+            alignSelf: 'flex-end',
           }}>
           ¿Has olvidado tu contraseña?
+        </Text>
+        <CustomButton
+          disable={submitDisable}
+          onPress={validate}
+          title={'Ingresar'}
+          marginTop={moderateScale(25, 0.1)}
+        />
+
+        <Text
+          onPress={() => {
+            navigation.navigate('Register');
+          }}
+          style={{
+            paddingHorizontal: moderateScale(10),
+            fontFamily: Fonts.regular,
+            color: colors.grey,
+            fontSize: FontSizes.regular,
+            marginTop: moderateScale(30, 0.1),
+          }}>
+          Crear cuenta nueva
         </Text>
       </View>
     </ScrollView>

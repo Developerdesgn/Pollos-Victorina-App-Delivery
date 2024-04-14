@@ -84,14 +84,14 @@ const App = () => {
 
   const [token, setToken] = useState('');
   const [loading, setLoading] = useState(false);
-  // const [userData, setUserData] = useState('');
+  const [userData, setUserData] = useState({});
   const userSetting = {
     token: token,
     setToken: setToken,
     loading: loading,
     setLoading: setLoading,
-    // userData: userData,
-    // setUserData: setUserData,
+    userData: userData,
+    setUserData: setUserData,
   };
   useEffect(() => {
     getData();
