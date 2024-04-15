@@ -1,46 +1,37 @@
+import Geolocation from '@react-native-community/geolocation';
+import {useIsFocused} from '@react-navigation/native';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {
-  View,
+  BackHandler,
+  Image,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  Button,
-  ScrollView,
-  Touchable,
-  TouchableWithoutFeedback,
-  BackHandler,
-  StyleSheet,
+  View,
 } from 'react-native';
-import React, {useContext, useEffect, useRef, useState} from 'react';
-import Header from '../../components/Header';
-import {moderateScale} from 'react-native-size-matters';
-import {
-  BackSvg,
-  Bin,
-  CallSvg,
-  ChatSvg,
-  GrayMark,
-  LoadingMark,
-  RedMark,
-  TrackOrderSvg,
-} from '../../assets/images/svg';
-import {colors} from '../../constants';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import Fonts from '../../assets/fonts';
-import FontSizes from '../../constants/fontSizes';
-import HeaderIcon from '../../components/HeaderIcon';
-import ComboChicken from '../../components/ComboChicken';
-import {useIsFocused} from '@react-navigation/native';
-import {screenHeight, screenWidth} from '../../constants/screenResolution';
-import CustomButton from '../../components/CustomButton';
-import Caller from '../../assets/images/svg/caller.svg';
-import styles from '../../globalStyle';
-import CustomModal from '../../components/modal';
-import {RiderServices} from '../../services';
-import {networkCheck} from '../../constants/axios';
-import {AppContext} from '../../Providers';
 import Geocoder from 'react-native-geocoding';
-import {GOOGLE_API_KEY} from '../AuthRider/Register';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {moderateScale} from 'react-native-size-matters';
+import {AppContext} from '../../Providers';
+import Fonts from '../../assets/fonts';
+import {Bin, ChatSvg} from '../../assets/images/svg';
+import Caller from '../../assets/images/svg/caller.svg';
+import ComboChicken from '../../components/ComboChicken';
+import CustomButton from '../../components/CustomButton';
+import HeaderIcon from '../../components/HeaderIcon';
+import Loader from '../../components/loader';
+import CustomModal from '../../components/modal';
+import {colors} from '../../constants';
+import {networkCheck} from '../../constants/axios';
+import FontSizes from '../../constants/fontSizes';
+import {screenHeight, screenWidth} from '../../constants/screenResolution';
+import styles from '../../globalStyle';
+import {RiderServices} from '../../services';
+import {GOOGLE_API_KEY} from '../AuthRider/Register';
 
 const LATITUDE = 29.9417666;
 const LONGITUDE = -95.3991524;
@@ -59,6 +50,8 @@ const ShippingDetailsRider = ({navigation, route}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [userLoc, setUserLoc] = useState({});
   const [region, setRegion] = useState(null);
+  const [riderLoc, setRiderLoc] = useState({});
+
   // const [address, setAddress] = useState({});
 
   useEffect(() => {
@@ -72,6 +65,45 @@ const ShippingDetailsRider = ({navigation, route}) => {
     );
     return () => backHandler.remove();
   }, []);
+
+  useEffect(() => {
+    // Function to fetch data from API
+    const saveLocation = async () => {
+      // console.log('fetch')
+      getaddress();
+    };
+    let intervalId;
+    // Call fetchData initially and every 3 seconds when the component is on the screen
+    if (isFocused) {
+      intervalId = setInterval(saveLocation, 5000);
+    } else {
+      clearInterval(intervalId);
+    }
+
+    // Cleanup function to clear the interval when the component unmounts or not on the screen
+    return () => clearInterval(intervalId);
+  }, [isFocused]);
+  // 180000
+
+  const getaddress = () => {
+    Geolocation.getCurrentPosition(info => {
+      console.log(info, 'coords');
+
+      saveRiderLocation({
+        latitude: info?.coords?.latitude,
+        longitude: info?.coords?.longitude,
+      });
+
+      setRiderLoc({
+        latitude: info?.coords?.latitude,
+        longitude: info?.coords?.longitude,
+      });
+      // getPhysicalAddress({
+      //   latitude: info?.coords?.latitude,
+      //   longitude: info?.coords?.longitude,
+      // });
+    });
+  };
 
   useEffect(() => {
     Geocoder.init(GOOGLE_API_KEY);
@@ -111,10 +143,32 @@ const ShippingDetailsRider = ({navigation, route}) => {
 
   const orderComplete = async id => {
     context.setLoading(true);
-
+    refRBSheet.current.close();
+    setModalVisible(false);
     await RiderServices.orderComplete({id: id, token: context.token})
       .then(async res => {
         console.log(res?.data, 'complete');
+        // setHistoryOrder(res?.data);
+
+        navigation.navigate('CompleteRider');
+      })
+      .catch(error => {
+        console.log(error, 'errr');
+        networkCheck(error);
+      })
+      .finally(() => context.setLoading(false));
+  };
+
+  const saveRiderLocation = async ({latitude, longitude}) => {
+    // context.setLoading(true);
+    const body = {
+      latitude: latitude,
+      longitude: longitude,
+    };
+
+    await RiderServices.saveRiderLocation({body: body, token: context.token})
+      .then(async res => {
+        console.log(res?.data, 'saved loc');
         // setHistoryOrder(res?.data);
       })
       .catch(error => {
@@ -298,8 +352,7 @@ const ShippingDetailsRider = ({navigation, route}) => {
           }}>
           <Marker
             onPress={() => {
-              // setAddress(address);
-              // refrbSheet.current.open();
+              refRBSheet.current.open();
             }}
             coordinate={{
               latitude: region?.latitude,
@@ -319,24 +372,27 @@ const ShippingDetailsRider = ({navigation, route}) => {
               style={{height: moderateScale(35), width: moderateScale(35)}}
             />
           </View> */}
-            <View
+            <TouchableOpacity
+              onPress={() => {
+                refRBSheet.current.open();
+              }}
               style={{
                 left: '50%',
                 position: 'absolute',
                 top: '55%',
                 // backgroundColor: colors.primary,
                 zIndex: 999,
+                marginTop: moderateScale(10),
               }}>
               <Image
                 source={require('../../assets/images/png/union.png')}
                 style={{height: moderateScale(35), width: moderateScale(35)}}
               />
-            </View>
+            </TouchableOpacity>
           </Marker>
           <Marker
             onPress={() => {
-              // setAddress(address);
-              // refrbSheet.current.open();
+              refRBSheet.current.open();
             }}
             coordinate={{
               latitude: userLoc?.latitude,
@@ -344,7 +400,10 @@ const ShippingDetailsRider = ({navigation, route}) => {
             }}
             title={userLoc?.name}
             description={userLoc?.description}>
-            <View
+            <TouchableOpacity
+              onPress={() => {
+                refRBSheet.current.open();
+              }}
               style={{
                 left: '50%',
                 position: 'absolute',
@@ -362,15 +421,15 @@ const ShippingDetailsRider = ({navigation, route}) => {
                 }}
                 style={{height: moderateScale(35), width: moderateScale(35)}}
               />
-            </View>
+            </TouchableOpacity>
           </Marker>
-          {/* <MapViewDirections
+          <MapViewDirections
             strokeColor={colors.primary}
             origin={region}
             destination={userLoc}
             apikey={GOOGLE_API_KEY}
             strokeWidth={moderateScale(5)}
-          /> */}
+          />
         </MapView>
       )}
 
@@ -379,7 +438,7 @@ const ShippingDetailsRider = ({navigation, route}) => {
         text={'Detalles del pedido'}
         marginTop={moderateScale(30, 0.1)}
       />
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={{
           alignItems: 'center',
           marginTop: moderateScale(100, 0.1),
@@ -388,12 +447,13 @@ const ShippingDetailsRider = ({navigation, route}) => {
           marginRight: 'auto',
         }}>
         <TrackOrderSvg />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <RBSheet
         closeOnPressBack={true}
         ref={refRBSheet}
         closeOnDragDown={true}
         closeOnPressMask={true}
+        minClosingHeight={moderateScale(100)}
         customStyles={{
           container: {
             height: moderateScale(460),
@@ -407,7 +467,8 @@ const ShippingDetailsRider = ({navigation, route}) => {
       </RBSheet>
       <CustomModal
         onPress1={() => {
-          navigation.navigate('CompleteRider');
+          console.log(route?.params?.data);
+          orderComplete(route?.params?.data?.o_id);
         }}
         onPress2={() => {
           setModalVisible(!modalVisible);
@@ -415,6 +476,14 @@ const ShippingDetailsRider = ({navigation, route}) => {
         setModalVisible={setModalVisible}
         modalVisible={modalVisible}
       />
+      <TouchableOpacity
+        onPress={() => {
+          refRBSheet.current.open();
+        }}
+        style={styles.bottom}>
+        <View style={styles.hl} />
+        <Text style={[styles.menuText, styles.btxt]}>open</Text>
+      </TouchableOpacity>
       {/* </View> */}
     </SafeAreaView>
   );

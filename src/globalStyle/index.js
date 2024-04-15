@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
     marginRight: moderateScale(10),
   },
   filter: {
-    
     marginBottom: moderateScale(15),
     marginRight: moderateScale(5),
     // paddingHorizontal: moderateScale(6),
@@ -135,6 +134,11 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     marginLeft: moderateScale(10),
   },
+  btxt: {
+    marginBottom: moderateScale(20),
+    alignSelf: 'center',
+    color: colors.primary,
+  },
 
   smallText: {
     fontSize: FontSizes.small,
@@ -178,6 +182,14 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
     color: colors.textBlack,
   },
+  hl: {
+    backgroundColor: colors.grey,
+    borderRadius: 10,
+    width: moderateScale(30),
+    height: moderateScale(5),
+    marginVertical: moderateScale(10),
+    alignSelf: 'center',
+  },
 
   secBack: {
     backgroundColor: colors.secondary,
@@ -192,6 +204,16 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: moderateScale(40),
     paddingVertical: moderateScale(20),
+  },
+
+  bottom: {
+    bottom: 0,
+    borderTopLeftRadius: moderateScale(15),
+    borderTopRightRadius: moderateScale(15),
+    backgroundColor: colors.white,
+    height: moderateScale(50),
+    width: '100%',
+    position: 'absolute',
   },
   //       margin padding          ///
   mT: {
@@ -280,7 +302,7 @@ const styles = StyleSheet.create({
     width: moderateScale(66),
     height: moderateScale(66),
     borderRadius: moderateScale(66 / 2),
-marginTop:moderateScale(25)
+    marginTop: moderateScale(25),
   },
   btn: {
     paddingVertical: moderateScale(5),

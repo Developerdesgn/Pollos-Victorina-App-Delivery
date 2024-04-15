@@ -18,6 +18,7 @@ export default API = {
   cancelOrder: `${baseURL}/cancel-order`,
   startOrder: `${baseURL}/rider-start-order`,
   orderComplete: `${baseURL}/rider-complete-order`,
+  saveRiderLocation: `${baseURL}/update-rider-current-location`,
 };
 
 export const networkCheck = error => {

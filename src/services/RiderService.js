@@ -83,3 +83,13 @@ export const orderComplete = ({id, token}) => {
     },
   );
 };
+
+export const saveRiderLocation = ({body, token}) => {
+  return axios.post(API.saveRiderLocation, body, {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': `application/json`,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};

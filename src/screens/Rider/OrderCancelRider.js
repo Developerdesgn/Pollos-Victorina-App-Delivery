@@ -1,4 +1,11 @@
-import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  Keyboard,
+} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import HeaderIcon from '../../components/HeaderIcon';
 import {moderateScale} from 'react-native-size-matters';
@@ -43,6 +50,7 @@ const OrderCancel = ({navigation, route}) => {
   const cancelOrder = async () => {
     if (reason && description) {
       context.setLoading(true);
+      Keyboard.dismiss();
       const body = {
         order_id: 1,
         cancel_reason: reason,
@@ -79,6 +87,7 @@ const OrderCancel = ({navigation, route}) => {
 
   return (
     <ScrollView
+      keyboardShouldPersistTaps={'handled'}
       showsVerticalScrollIndicator={false}
       style={{
         backgroundColor: colors.white,

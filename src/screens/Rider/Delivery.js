@@ -20,6 +20,7 @@ const Delivery = ({navigation}) => {
   const [historyCount, setHistoryCount] = useState(0);
   const [orderinProgress, setOrderinProgress] = useState([]);
   const [historyOrder, setHistoryOrder] = useState([]);
+  const [user, setUser] = useState({});
 
   useEffect(() => {
     if (isFocused) {
@@ -27,8 +28,14 @@ const Delivery = ({navigation}) => {
       getOrderInProgress(true);
       getHistoryOrders(true);
       getCount();
+      getUser();
     }
   }, [isFocused]);
+
+  const getUser = async () => {
+    const user = await AsyncStorage.getItem('userData');
+    setUser(JSON.parse(user));
+  };
 
   const getOrderInProgress = async loader => {
     loader ? context.setLoading(true) : null;
@@ -109,9 +116,9 @@ const Delivery = ({navigation}) => {
             AsyncStorage.removeItem('token');
             // navigation.navigate('AuthScreensRider');
           }}
-          title={`${context?.userData?.name} ${context?.userData?.last_name}`}
+          title={`${user?.name} ${user?.last_name}`}
           text={'Delivery interno'}
-          ID={context?.userData?.id}
+          ID={user?.id}
         />
         {/* {historyCount && ordercount && ( */}
         <Tabs

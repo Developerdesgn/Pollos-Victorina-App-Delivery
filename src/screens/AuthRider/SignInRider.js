@@ -57,6 +57,11 @@ const SignInRider = ({navigation}) => {
               'userData',
               JSON.stringify(res?.data?.user),
             );
+
+            await AsyncStorage.setItem(
+              'userData',
+              JSON.stringify(res?.data?.user),
+            );
           }
         })
         .catch(error => {
@@ -71,6 +76,7 @@ const SignInRider = ({navigation}) => {
 
   return (
     <ScrollView
+      keyboardShouldPersistTaps={'handled'}
       style={{flex: 1, backgroundColor: colors.white, width: screenWidth}}>
       <Header logo={true} back={true} />
       <View
