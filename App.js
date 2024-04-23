@@ -103,16 +103,18 @@ const App = () => {
 
   const getData = async () => {
     const token = await AsyncStorage.getItem('token');
-    // const data = await AsyncStorage.getItem('userData');
+    const data = await AsyncStorage.getItem('userData');
 
-    console.log(token);
+    console.log(token, data);
 
-    if (token) {
-      setToken(token);
+    if (JSON.parse(data)) {
+      setUserData(JSON.parse(data));
     }
-    // if (JSON.parse(data)) {
-    //   setUserData(JSON.parse(data));
-    // }
+    if (token) {
+      // setTimeout(() => {
+      setToken(token);
+      // }, 1000);
+    }
   };
   return (
     <AppContext.Provider value={userSetting}>

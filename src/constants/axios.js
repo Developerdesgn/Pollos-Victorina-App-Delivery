@@ -13,7 +13,7 @@ export default API = {
   changePassword: `${baseURL}/auth/change-password`,
   getCount: `${baseURL}/rider-orders-count`,
   orderinProgress: `${baseURL}/rider-orders-in-progress`,
-  orderinHistory: `${baseURL}/rider-orders-in-progress`,
+  orderinHistory: `${baseURL}/rider-orders-history`,
   getCancelReasons: `${baseURL}/get-order-cancel-reasons`,
   cancelOrder: `${baseURL}/cancel-order`,
   startOrder: `${baseURL}/rider-start-order`,

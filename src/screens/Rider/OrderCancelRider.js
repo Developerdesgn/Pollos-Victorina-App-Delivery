@@ -5,6 +5,7 @@ import {
   TextInput,
   ScrollView,
   Keyboard,
+  Alert,
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import HeaderIcon from '../../components/HeaderIcon';
@@ -71,6 +72,14 @@ const OrderCancel = ({navigation, route}) => {
         .finally(() => {
           context.setLoading(false);
         });
+    } else {
+      if (!reason) {
+        Alert.alert('Por favor seleccione una razón');
+      } else if (!description) {
+        Alert.alert('explicar con detalle');
+      } else {
+        Alert.alert('Por favor seleccione el motivo de la cancelación');
+      }
     }
   };
 
@@ -138,7 +147,7 @@ const OrderCancel = ({navigation, route}) => {
         />
         <View style={{alignItems: 'center'}}>
           <CustomButton
-            disable={reason === '' || description === ''}
+            // disable={reason === '' || description === ''}
             onPress={cancelOrder}
             title={'Cancelar pedido'}
             width={moderateScale(300)}

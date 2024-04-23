@@ -123,14 +123,18 @@ const Register = ({navigation}) => {
         console.log(res?.data, 'len');
         // navigation.navigate('SignIn');
         if (res.status === 200) {
-          context.setToken(res?.data?.token);
           context.setUserData(res?.data?.user);
           await AsyncStorage.setItem('password', password);
-          await AsyncStorage.setItem('token', res?.data?.token);
+
           await AsyncStorage.setItem(
             'userData',
             JSON.stringify(res?.data?.user),
           );
+
+          // setTimeout(async () => {
+          await AsyncStorage.setItem('token', res?.data?.token);
+          context.setToken(res?.data?.token);
+          // }, 1000);
         }
       })
       .catch(err => {

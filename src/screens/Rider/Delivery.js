@@ -14,7 +14,6 @@ import {networkCheck} from '../../constants/axios';
 const Delivery = ({navigation}) => {
   const context = useContext(AppContext);
   const [selectedButton, setSelectedButton] = useState('PEDIDOS EN CURSO');
-  console.log(context?.userData, 'sda');
   const isFocused = useIsFocused();
   const [ordercount, setOrderCount] = useState(0);
   const [historyCount, setHistoryCount] = useState(0);
@@ -33,8 +32,13 @@ const Delivery = ({navigation}) => {
   }, [isFocused]);
 
   const getUser = async () => {
-    const user = await AsyncStorage.getItem('userData');
-    setUser(JSON.parse(user));
+    context.setLoading(true);
+    setUser(context.userData);
+    console.log(context.userData, 'newew');
+    // const user = await AsyncStorage.getItem('userData');
+    // console.log(user, 'renavavs');
+    // setUser(JSON.parse(user));
+    context.setLoading(false);
   };
 
   const getOrderInProgress = async loader => {
@@ -92,7 +96,7 @@ const Delivery = ({navigation}) => {
       .then(async res => {
         console.log(res?.data, 'count');
         setHistoryCount(res?.data?.history);
-        setOrderCount(res?.data?.in - progress);
+        setOrderCount(res?.data['in-progress']);
       })
       .catch(error => {
         console.log(error, 'errr');
@@ -110,16 +114,22 @@ const Delivery = ({navigation}) => {
           styles.pH,
           styles.screeWidthContainer,
         ]}>
+        {/* {user?.name ? ( */}
         <RHeader
           onPress={() => {
             context.setToken('');
+            context.setUserData({});
             AsyncStorage.removeItem('token');
+            AsyncStorage.removeItem('userData');
+
             // navigation.navigate('AuthScreensRider');
           }}
-          title={`${user?.name} ${user?.last_name}`}
+          title={`${context?.userData?.name} ${context?.userData?.last_name}`}
           text={'Delivery interno'}
-          ID={user?.id}
+          ID={context?.userData?.id}
         />
+        {/* ) : null} */}
+
         {/* {historyCount && ordercount && ( */}
         <Tabs
           selectedButton={selectedButton}
