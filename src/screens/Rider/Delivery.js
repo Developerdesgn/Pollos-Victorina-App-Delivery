@@ -1,5 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {FlatList, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {
+  BackHandler,
+  FlatList,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import styles from '../../globalStyle';
 import RHeader from '../../components/RiderHeader';
 import DeliveryItem from '../../components/deliveryItem';
@@ -10,6 +17,7 @@ import {AppContext} from '../../Providers';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RiderServices} from '../../services';
 import {networkCheck} from '../../constants/axios';
+import Geolocation from '@react-native-community/geolocation';
 
 const Delivery = ({navigation}) => {
   const context = useContext(AppContext);
@@ -97,6 +105,55 @@ const Delivery = ({navigation}) => {
         console.log(res?.data, 'count');
         setHistoryCount(res?.data?.history);
         setOrderCount(res?.data['in-progress']);
+      })
+      .catch(error => {
+        console.log(error, 'errr');
+        networkCheck(error);
+      })
+      .finally(() => context.setLoading(false));
+  };
+
+  useEffect(() => {
+    // Function to fetch data from API
+    const saveLocation = async () => {
+      console.log('fetch');
+      getaddress();
+    };
+    let intervalId;
+    // Call fetchData initially and every 3 seconds when the component is on the screen
+    if (isFocused) {
+      intervalId = setInterval(saveLocation, 500000);
+    } else {
+      clearInterval(intervalId);
+    }
+
+    // Cleanup function to clear the interval when the component unmounts or not on the screen
+    return () => clearInterval(intervalId);
+  }, [isFocused]);
+  // 180000
+
+  const getaddress = () => {
+    Geolocation.getCurrentPosition(info => {
+      console.log(info, 'coords');
+
+      saveRiderLocation({
+        latitude: info?.coords?.latitude,
+        longitude: info?.coords?.longitude,
+      });
+    });
+  };
+
+  const saveRiderLocation = async ({latitude, longitude}) => {
+    // context.setLoading(true);
+    const body = {
+      latitude: latitude,
+      longitude: longitude,
+    };
+
+    await RiderServices.saveRiderLocation({body: body, token: context.token})
+      .then(async res => {
+        console.log(res?.data, 'saved loc');
+        // setHistoryOrder(res?.data);
       })
       .catch(error => {
         console.log(error, 'errr');

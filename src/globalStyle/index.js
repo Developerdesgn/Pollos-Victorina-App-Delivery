@@ -4,7 +4,7 @@ import {moderateScale} from 'react-native-size-matters';
 import fontSizes from '../constants/fontSizes';
 import FontSizes from '../constants/fontSizes';
 import Fonts from '../assets/fonts';
-import {screenWidth} from '../constants/screenResolution';
+import {screenHeight, screenWidth} from '../constants/screenResolution';
 
 const styles = StyleSheet.create({
   container: {
@@ -12,6 +12,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     alignItems: 'center',
     // height:'100%'
+  },
+  sav: {
+    flex: 1,
+    height: screenHeight * 0.5,
+    position: 'relative',
   },
   mainView: {
     paddingBottom: moderateScale(30),
@@ -333,6 +338,18 @@ const styles = StyleSheet.create({
     height: null,
     backgroundColor: colors.white,
     fontFamily: Fonts.medium,
+  },
+  abs: {
+    left: '50%',
+    position: 'absolute',
+    top: '55%',
+    zIndex: 999,
+  },
+  img: {
+    height: moderateScale(35),
+    width: moderateScale(35),
+    resizeMode: 'contain',
+    tintColor: 'red',
   },
 });
 

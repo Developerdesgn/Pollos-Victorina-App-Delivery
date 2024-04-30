@@ -42,7 +42,7 @@ const SPACE = 0.01;
 const ShippingDetailsRider = ({navigation, route}) => {
   const context = useContext(AppContext);
   const mapRef = useRef();
-
+  const markerRef = useRef();
   const refRBSheet = useRef();
   const isFocused = useIsFocused();
   // console.log('dat', route?.params?.data);
@@ -88,25 +88,18 @@ const ShippingDetailsRider = ({navigation, route}) => {
   const getaddress = () => {
     Geolocation.getCurrentPosition(info => {
       console.log(info, 'coords');
-
-      saveRiderLocation({
-        latitude: info?.coords?.latitude,
-        longitude: info?.coords?.longitude,
-      });
-
       setRiderLoc({
         latitude: info?.coords?.latitude,
         longitude: info?.coords?.longitude,
       });
-      // getPhysicalAddress({
-      //   latitude: info?.coords?.latitude,
-      //   longitude: info?.coords?.longitude,
-      // });
+      saveRiderLocation({
+        latitude: info?.coords?.latitude,
+        longitude: info?.coords?.longitude,
+      });
     });
   };
 
   useEffect(() => {
-    Geocoder.init(GOOGLE_API_KEY);
     if (isFocused) {
       getLatLong(route?.params?.data?.branche_address, setRegion);
       getLatLong(route?.params?.data?.user_address, setUserLoc);
@@ -135,8 +128,6 @@ const ShippingDetailsRider = ({navigation, route}) => {
 
   useEffect(() => {
     if (isFocused) {
-      // Open the RBSheet when the screen is focused
-      console.log('yes');
       refRBSheet.current.open();
     }
   }, [isFocused]);
@@ -148,8 +139,6 @@ const ShippingDetailsRider = ({navigation, route}) => {
     await RiderServices.orderComplete({id: id, token: context.token})
       .then(async res => {
         console.log(res?.data, 'complete');
-        // setHistoryOrder(res?.data);
-
         navigation.navigate('CompleteRider');
       })
       .catch(error => {
@@ -325,10 +314,7 @@ const ShippingDetailsRider = ({navigation, route}) => {
     <SafeAreaView
       style={{
         ...StyleSheet.absoluteFillObject,
-        // alignItems: 'center',
-        flex: 1,
-        height: screenHeight * 0.5,
-        position: 'relative',
+        ...styles.sav,
       }}>
       {context?.loading ? <Loader /> : null}
       {region && (
@@ -338,11 +324,6 @@ const ShippingDetailsRider = ({navigation, route}) => {
           style={{
             ...StyleSheet.absoluteFillObject,
           }}
-          // onRegionChange={text => {}}
-          // onRegionChangeComplete={e => {
-          //   // console.log(e)
-          //   setRegion(e);
-          // }}
           region={region}
           initialRegion={{
             latitude: 18.4338645,
@@ -350,79 +331,39 @@ const ShippingDetailsRider = ({navigation, route}) => {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}>
+          {riderLoc ? (
+            <Marker.Animated ref={markerRef} coordinate={riderLoc}>
+              {/* <View style={styles.abs}> */}
+              <Image
+                source={require('../../assets/images/png/rider.png')}
+                style={styles.img}
+              />
+              {/* </View> */}
+            </Marker.Animated>
+          ) : null}
+
           <Marker
-            onPress={() => {
-              refRBSheet.current.open();
-            }}
             coordinate={{
               latitude: region?.latitude,
               longitude: region?.longitude,
             }}>
-            {/* <View
-            style={{
-              left: '50%',
-              position: 'absolute',
-              top: '50%',
-              zIndex: 999,
-            }}>
+            {/* <View style={styles.abs}> */}
             <Image
-              source={{
-                uri: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',
-              }}
-              style={{height: moderateScale(35), width: moderateScale(35)}}
+              source={require('../../assets/images/png/rider.png')}
+              style={[
+                {height: moderateScale(25), width: moderateScale(25)},
+                {tintColor: 'red'},
+              ]}
             />
-          </View> */}
-            <TouchableOpacity
-              onPress={() => {
-                refRBSheet.current.open();
-              }}
-              style={{
-                left: '50%',
-                position: 'absolute',
-                top: '55%',
-                // backgroundColor: colors.primary,
-                zIndex: 999,
-                marginTop: moderateScale(10),
-              }}>
-              <Image
-                source={require('../../assets/images/png/union.png')}
-                style={{height: moderateScale(35), width: moderateScale(35)}}
-              />
-            </TouchableOpacity>
+            {/* </View> */}
           </Marker>
           <Marker
-            onPress={() => {
-              refRBSheet.current.open();
-            }}
             coordinate={{
               latitude: userLoc?.latitude,
               longitude: userLoc?.longitude,
             }}
-            title={userLoc?.name}
-            description={userLoc?.description}>
-            <TouchableOpacity
-              onPress={() => {
-                refRBSheet.current.open();
-              }}
-              style={{
-                left: '50%',
-                position: 'absolute',
-                top: '55%',
-                height: moderateScale(60),
-                width: moderateScale(60),
-                zIndex: 999,
-                // // backgroundColor:"yellow",
-                // marginTop: moderateScale(15),
-                // marginLeft: moderateScale(8),
-              }}>
-              <Image
-                source={{
-                  uri: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',
-                }}
-                style={{height: moderateScale(35), width: moderateScale(35)}}
-              />
-            </TouchableOpacity>
-          </Marker>
+            pinColor="red"
+          />
           <MapViewDirections
             strokeColor={colors.primary}
             origin={region}
