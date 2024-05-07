@@ -69,7 +69,6 @@ const ShippingDetailsRider = ({navigation, route}) => {
   useEffect(() => {
     // Function to fetch data from API
     const saveLocation = async () => {
-      // console.log('fetch')
       getaddress();
     };
     let intervalId;
@@ -349,7 +348,7 @@ const ShippingDetailsRider = ({navigation, route}) => {
             }}>
             {/* <View style={styles.abs}> */}
             <Image
-              source={require('../../assets/images/png/rider.png')}
+              source={require('../../assets/images/png/union.png')}
               style={[
                 {height: moderateScale(25), width: moderateScale(25)},
                 {tintColor: 'red'},
@@ -366,7 +365,7 @@ const ShippingDetailsRider = ({navigation, route}) => {
           />
           <MapViewDirections
             strokeColor={colors.primary}
-            origin={region}
+            origin={riderLoc ? riderLoc : region}
             destination={userLoc}
             apikey={GOOGLE_API_KEY}
             strokeWidth={moderateScale(5)}
