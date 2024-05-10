@@ -18,6 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RiderServices} from '../../services';
 import {networkCheck} from '../../constants/axios';
 import Geolocation from '@react-native-community/geolocation';
+import {GOOGLE_API_KEY} from '../AuthRider/Register';
+import Geocoder from 'react-native-geocoding';
 
 const Delivery = ({navigation}) => {
   const context = useContext(AppContext);
@@ -30,6 +32,7 @@ const Delivery = ({navigation}) => {
   const [user, setUser] = useState({});
 
   useEffect(() => {
+    Geocoder.init(GOOGLE_API_KEY);
     if (isFocused) {
       // Fetch data or perform actions on screen focus
       getOrderInProgress(true);

@@ -74,6 +74,7 @@ const SignInRider = ({navigation}) => {
 
   return (
     <ScrollView
+      showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps={'handled'}
       style={{flex: 1, backgroundColor: colors.white, width: screenWidth}}>
       <Header logo={true} back={true} />

@@ -339,11 +339,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     fontFamily: Fonts.medium,
   },
-  abs: {
-    left: '50%',
+  zoom: {
     position: 'absolute',
-    top: '55%',
-    zIndex: 999,
+    padding: moderateScale(10),
+    // width: moderateScale(85),
+    borderRadius: moderateScale(5),
+    top: moderateScale(80),
+    marginLeft: moderateScale(10),
+    backgroundColor: colors.primary,
+  },
+
+  abs: {
+    // left: '50%',
+    // position: 'absolute',
+    // // top: '55%',
+    // zIndex: 999,
   },
   img: {
     height: moderateScale(35),

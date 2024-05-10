@@ -3,7 +3,10 @@ import {useIsFocused} from '@react-navigation/native';
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {
   BackHandler,
+  Dimensions,
   Image,
+  Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import Geocoder from 'react-native-geocoding';
-import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, {Marker, PROVIDER_GOOGLE, Camera} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -32,12 +35,40 @@ import {screenHeight, screenWidth} from '../../constants/screenResolution';
 import styles from '../../globalStyle';
 import {RiderServices} from '../../services';
 import {GOOGLE_API_KEY} from '../AuthRider/Register';
+import Rider from '../../assets/images/svg/delivery.svg';
+import Feather from 'react-native-vector-icons/Feather';
 
 const LATITUDE = 29.9417666;
 const LONGITUDE = -95.3991524;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = 0.0421;
 const SPACE = 0.01;
+
+const {width, height} = Dimensions.get('window');
+const ASPECT_RATIO = width / height;
+
+const obj = {
+  centroid: {
+    latitude: '24.2472',
+    longitude: '89.920914',
+  },
+  boundingBox: {
+    southWest: {
+      latitude: '24.234631',
+      longitude: '89.907127',
+    },
+    northEast: {
+      latitude: '24.259769',
+      longitude: '89.934692',
+    },
+  },
+};
+const lat = parseFloat(obj.centroid.latitude);
+const lng = parseFloat(obj.centroid.longitude);
+const northeastLat = parseFloat(obj.boundingBox.northEast.latitude);
+const southwestLat = parseFloat(obj.boundingBox.southWest.latitude);
+const latDelta = northeastLat - southwestLat;
+const lngDelta = latDelta * ASPECT_RATIO;
 
 const ShippingDetailsRider = ({navigation, route}) => {
   const context = useContext(AppContext);
@@ -48,9 +79,9 @@ const ShippingDetailsRider = ({navigation, route}) => {
   // console.log('dat', route?.params?.data);
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [userLoc, setUserLoc] = useState({});
+  const [userLoc, setUserLoc] = useState(null);
   const [region, setRegion] = useState(null);
-  const [riderLoc, setRiderLoc] = useState({});
+  const [riderLoc, setRiderLoc] = useState(null);
 
   // const [address, setAddress] = useState({});
 
@@ -69,12 +100,13 @@ const ShippingDetailsRider = ({navigation, route}) => {
   useEffect(() => {
     // Function to fetch data from API
     const saveLocation = async () => {
+      // console.log('fetch')
       getaddress();
     };
     let intervalId;
     // Call fetchData initially and every 3 seconds when the component is on the screen
     if (isFocused) {
-      intervalId = setInterval(saveLocation, 5000);
+      // intervalId = setInterval(saveLocation, 5000);
     } else {
       clearInterval(intervalId);
     }
@@ -86,11 +118,16 @@ const ShippingDetailsRider = ({navigation, route}) => {
 
   const getaddress = () => {
     Geolocation.getCurrentPosition(info => {
-      console.log(info, 'coords');
-      setRiderLoc({
-        latitude: info?.coords?.latitude,
-        longitude: info?.coords?.longitude,
-      });
+      // console.log(info, 'coords');
+      // setRiderLoc({
+      //   latitude: info?.coords?.latitude,
+      //   longitude: info?.coords?.longitude,
+      // });
+      let r = {
+        latitude: 18.4819735,
+        longitude: -69.9288782,
+      };
+      setRiderLoc(r);
       saveRiderLocation({
         latitude: info?.coords?.latitude,
         longitude: info?.coords?.longitude,
@@ -109,14 +146,14 @@ const ShippingDetailsRider = ({navigation, route}) => {
     // context.setLoading(true);
     Geocoder.from(address)
       .then(json => {
-        console.log(json, 'skd');
+        console.log(json, address, 'skd');
         var location = json.results[0].geometry.location;
         if (json.status === 'OK') {
           setData({
             latitude: location.lat,
             longitude: location.lng,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LATITUDE_DELTA,
+            latitudeDelta: latDelta,
+            longitudeDelta: lngDelta,
           });
         }
       })
@@ -130,6 +167,27 @@ const ShippingDetailsRider = ({navigation, route}) => {
       refRBSheet.current.open();
     }
   }, [isFocused]);
+
+  useEffect(() => {
+    if (region && userLoc) {
+      console.log(region, userLoc, 'loc');
+    }
+  }, [region, userLoc]);
+
+  const openMap = () => {
+    const scheme = Platform.select({
+      ios: 'maps://0,0?q=',
+      android: 'geo:0,0?q=',
+    });
+    const latLng = `${userLoc.latitude},${userLoc?.longitude}`;
+    const label = 'Custom Label';
+    const url = Platform.select({
+      ios: `${scheme}${label}@${latLng}`,
+      android: `${scheme}${latLng}(${label})`,
+    });
+
+    Linking.openURL(url);
+  };
 
   const orderComplete = async id => {
     context.setLoading(true);
@@ -164,6 +222,28 @@ const ShippingDetailsRider = ({navigation, route}) => {
         networkCheck(error);
       })
       .finally(() => context.setLoading(false));
+  };
+
+  const handleZoomIn = () => {
+    mapRef.current?.getCamera().then((cam: Camera) => {
+      if (Platform.OS === 'android') {
+        cam.zoom += 1;
+      } else {
+        cam.altitude /= 2;
+      }
+      mapRef.current?.animateCamera(cam);
+    });
+  };
+
+  const handleZoomOut = () => {
+    mapRef.current?.getCamera().then((cam: Camera) => {
+      if (Platform.OS === 'android') {
+        cam.zoom -= 1;
+      } else {
+        cam.altitude *= 2;
+      }
+      mapRef.current?.animateCamera(cam);
+    });
   };
 
   const RBSheetComponent = () => {
@@ -316,7 +396,7 @@ const ShippingDetailsRider = ({navigation, route}) => {
         ...styles.sav,
       }}>
       {context?.loading ? <Loader /> : null}
-      {region && (
+      {region && userLoc ? (
         <MapView
           ref={mapRef}
           provider={PROVIDER_GOOGLE}
@@ -327,16 +407,17 @@ const ShippingDetailsRider = ({navigation, route}) => {
           initialRegion={{
             latitude: 18.4338645,
             longitude: -68.9658817,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitudeDelta: latDelta,
+            longitudeDelta: lngDelta,
           }}>
           {riderLoc ? (
             <Marker.Animated ref={markerRef} coordinate={riderLoc}>
               {/* <View style={styles.abs}> */}
-              <Image
+              {/* <Image
                 source={require('../../assets/images/png/rider.png')}
                 style={styles.img}
-              />
+              /> */}
+              <Rider width={moderateScale(24)} height={moderateScale(24)} />
               {/* </View> */}
             </Marker.Animated>
           ) : null}
@@ -349,10 +430,7 @@ const ShippingDetailsRider = ({navigation, route}) => {
             {/* <View style={styles.abs}> */}
             <Image
               source={require('../../assets/images/png/union.png')}
-              style={[
-                {height: moderateScale(25), width: moderateScale(25)},
-                {tintColor: 'red'},
-              ]}
+              style={[{height: moderateScale(25), width: moderateScale(25)}]}
             />
             {/* </View> */}
           </Marker>
@@ -371,13 +449,34 @@ const ShippingDetailsRider = ({navigation, route}) => {
             strokeWidth={moderateScale(5)}
           />
         </MapView>
-      )}
-
+      ) : null}
       <HeaderIcon
         navigation={navigation}
         text={'Detalles del pedido'}
         marginTop={moderateScale(30, 0.1)}
       />
+      <TouchableOpacity onPress={handleZoomIn} style={styles.zoom}>
+        <Feather
+          name="zoom-in"
+          size={moderateScale(24)}
+          color={colors.white}
+          onPress={handleZoomIn}
+        />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={handleZoomOut}
+        style={[
+          styles.zoom,
+          {margin: moderateScale(10), top: moderateScale(120)},
+        ]}>
+        <Feather
+          name="zoom-out"
+          size={moderateScale(24)}
+          color={colors.white}
+          onPress={handleZoomOut}
+        />
+      </TouchableOpacity>
       {/* <TouchableOpacity
         style={{
           alignItems: 'center',
@@ -403,22 +502,33 @@ const ShippingDetailsRider = ({navigation, route}) => {
         }}>
         <ScrollView>
           <RBSheetComponent />
+          <CustomModal
+            onPress1={() => {
+              console.log(route?.params?.data);
+              orderComplete(route?.params?.data?.o_id);
+            }}
+            onPress2={() => {
+              setModalVisible(!modalVisible);
+            }}
+            setModalVisible={setModalVisible}
+            modalVisible={modalVisible}
+          />
         </ScrollView>
       </RBSheet>
-      <CustomModal
-        onPress1={() => {
-          console.log(route?.params?.data);
-          orderComplete(route?.params?.data?.o_id);
-        }}
-        onPress2={() => {
-          setModalVisible(!modalVisible);
-        }}
-        setModalVisible={setModalVisible}
-        modalVisible={modalVisible}
-      />
+      <TouchableOpacity
+        onPress={handleZoomOut}
+        style={[{position: 'absolute', bottom: moderateScale(100)}]}>
+        <Feather
+          name="zoom-out"
+          size={moderateScale(24)}
+          color={colors.white}
+          onPress={handleZoomOut}
+        />
+      </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
-          refRBSheet.current.open();
+          // refRBSheet.current.open();
+          openMap();
         }}
         style={styles.bottom}>
         <View style={styles.hl} />

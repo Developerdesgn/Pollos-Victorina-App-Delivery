@@ -37,7 +37,7 @@ const ComboChicken = ({
         {data?.product_image ? (
           <Image
             source={{uri: data?.product_image}}
-            resizeMode={'cover'}
+            resizeMode={'contain'}
             style={{
               width: '100%',
               height: '100%',
